@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>修改市区页面</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        form {
+            width: 270px;
+        }
+
+        input {
+            width: 70%;
+            background: #eee;
+        }
+
+        input:focus {
+            background: #fff;
+        }
+
+        form {
+            padding: 0 12px 12px;
+        }
+
+        label {
+            display: block;
+            padding-bottom: 12px;
+        }
+
+        .label-text {
+            width: 30%;
+            float: left;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div id="wrap">
+        <div id="header">
+            <div style="float: right;padding-top: 24px">{{time}}&emsp;</div>
+            <h1>广东省多彩乡村宣传系统</h1>
+        </div>
+        <div id="header-bar"></div>
+        <div id="content" style="height: 360px">
+            <img src="../img/index.jpg" style="float: right;height: 320px">
+            <h2>修改市区</h2>
+            <form action="citylist.html" method="post">
+                <label>
+                    <div class="label-text">市区</div>
+                    <input type="text" v-model="city.name">
+                </label>
+                <label>
+                    <div class="label-text">帮扶镇个数</div>
+                    <input type="text" v-model="city.placecounts">
+                </label>
+                <button type="button" @click="updateCity">提 交</button>&emsp;
+                <a href="citylist.html">返回</a>
+            </form>
+        </div>
+        <div id="footer">
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../js/vue.js"></script>
+<script src="../js/axios.min.js"></script>
+<script>
+    const app = new Vue({
+        el: "#app",
+        data: {
+            id: "",
+            city: {},
+            time: ""
+        },
+        methods: {
+            findOneCity() {
+                axios.get("http://localhost:8989/city/findOne?id=" + this.id).then((res) => {
+                    this.city = res.data;
+                });
+            },
+            updateCity() {
+                axios.post("http://localhost:8989/city/update", this.city).then((res) => {
+                    if (res.data.state) {
+                        alert(res.data.msg + "点击确定跳转到市区列表页面!");
+                        location.href = "./citylist.html";
+                    } else {
+                        alert(res.data.msg);
+                    }
+                });
+            }
+        },
+        created() {
+            this.id = location.href.substring(location.href.indexOf("=") + 1);
+            this.findOneCity();
+
+            let now = new Date();
+            this.time = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+        }
+    });
+</script>
